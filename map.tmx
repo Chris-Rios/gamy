@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="220" height="20" tilewidth="24" tileheight="24">
+ <tileset firstgid="1" name="required_documents" tilewidth="24" tileheight="24">
+  <image source="required_documents.png" width="48" height="96"/>
+ </tileset>
+ <tileset firstgid="9" name="tiles_spritesheet" tilewidth="24" tileheight="24">
+  <image source="tiles_spritesheet.png" width="914" height="936"/>
+ </tileset>
+ <tileset firstgid="1491" name="amy" tilewidth="48" tileheight="48">
+  <image source="amy.png" width="432" height="48"/>
+ </tileset>
+ <layer name="layer1" width="220" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzt0jEKwCAQBEDzZ9P7DvMZ87MI16cS4WQGtrhuF64UAAAAAAAAAAAAAAAAAAD4V69S7kirkaV39j27+3O2Pn/ribQeWXpn37O7P2cb87feSBuRpXf2Pbv7k9cHRyBxLw==
+  </data>
+ </layer>
+ <layer name="layer2" width="220" height="20">
+  <properties>
+   <property name="collides" value="true"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJztmj0vBFEUhq+d3aBE0BI0BCXio0RJUCJBZ1dJdEp0Pnr/wJZ2fwSVDRp+ArIq4uOdrGIz3Dtzd+fsnTtz3uTJHTNzMubMPbnvuVkhWCwWi8VisVgUek4L8QJe07QxLBZLiM6MEF2gO0MbY7OuU0LcVIG/Dxr9PzQj1y2gVZHzIPewzGoS32YKTGt8o1pibFYZNfZWRdlAvQ0j1yNgVJHzIPeYUhu8UDvoYE8Umthn0mkJNbQMVhS1pLrH9No3hjkxDiZ4boSmpPlMm2R67VtFna2B9QD19tAkDu7BXQWBY/eclaJcg5LmM115eztT/Z2fgqyPUdE36uwLfFYQOHbPWSleg8KVt7cz1d/FSQPIXz/oqyBw7J6zUklcg1h6Mt3rBVWcfCcruaLo9Sj2J231nX49nc71OOxR7uP7eXsyL/sWfNdq6axZFL0exf6krb7Tr6fTuR6H/vAC9ebtybxcWFZvNu1Pxl1+PZ3O9aj3h9uokyzIWVYv9cqm/cmwFLS/o+oDZV6vFj8oi4m6tzxBHk/BWcLqLYkK2t9R9YEyr1eLH5TFRN1bXiGPBVDkeou9gvZ3VH2gzOvV4gdlMVH1ltOOPzMO3fN7sMb3gks8I++EM8rIE7zPPOZi++8eo0lM/v5yEPkcAgXUYjH1d0SOtH2fyg/WE6+aH41gE2z4jFuE9TaLHMyBWzyj5IQzyigRvM8O6m38d4/RJCZ/f7mAfC6CR9TVU+rviBxp+z6VH6wnXjU/GsEROPQZjwnrLYt5kgPveMaHE84o44Pgfc5Rb+7+omlM7m/uIp97IA0y/4zIkbbvU/nBeuJV86MR/ADN+Kuc
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1" width="220" height="20">
+  <properties>
+   <property name="collision" value="true"/>
+  </properties>
+  <object x="408" y="44" width="1"/>
+  <object name="Passport" type="required_documents" gid="1" x="409" y="55"/>
+  <object name="Bachelor's Degree" type="required_documents" gid="3" x="179" y="369"/>
+  <object name="Sealed Transcript" type="required_documents" gid="5" x="1038" y="129"/>
+  <object name="Resume" type="required_documents" gid="6" x="1508" y="34"/>
+  <object name="Background Check" type="required_documents" gid="7" x="2324" y="83">
+   <properties>
+    <property name="group" value=""/>
+   </properties>
+  </object>
+  <object name="Letter of Recommendation" type="required_documents" gid="2" x="3056" y="287"/>
+  <object name="Letter of Recommendation" type="required_documents" gid="2" x="3302" y="292"/>
+  <object name="Passport Photo" type="required_documents" gid="4" x="3793" y="304"/>
+  <object name="Passport Photo" type="required_documents" gid="4" x="3815" y="130"/>
+  <object name="Passport Photo" type="required_documents" gid="4" x="3911" y="-2"/>
+  <object name="Passport Photo" type="required_documents" gid="4" x="4124" y="206"/>
+  <object name="Passport Photo" type="required_documents" gid="4" x="4222" y="3"/>
+  <object name="Passport Photo" type="required_documents" gid="4" x="4364" y="85"/>
+  <object name="Passport Photo" type="required_documents" gid="4" x="3935" y="224"/>
+  <object name="TEFL Certification" type="required_documents" gid="8" x="1990" y="200"/>
+ </objectgroup>
+</map>
