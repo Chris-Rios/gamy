@@ -1,9 +1,9 @@
 <!doctype html> 
 <html lang="en"> 
 <head> 
-	<meta charset="UTF-8" />
+    <meta charset="UTF-8" />
     <title>Phaser - Making your first game, part 9</title>
-	<script type="text/javascript" src="phaser.js"></script>
+    <script type="text/javascript" src="phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -14,54 +14,110 @@
 
 <script type="text/javascript">
 
-var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 function preload() {
 
-    game.load.tilemap('map', 'map.json' , null , Phaser.Tilemap.TILED_JSON)
-    game.load.image('required_documents' , 'required_documents.png')
-    game.load.image('tiles_spritesheet', 'tiles_spritesheet.png')
+    game.load.image('sky', 'sky.png');
+    game.load.image('ground', 'platform.png');
+    game.load.image('sp', 'small_platform.png')
+    game.load.image('mailbox', 'mailbox.png')
+
+    game.load.image('passport', 'passport.png');
+    game.load.image('photo', 'photo.png');
+    game.load.image('bgcheck', 'bgcheck.png');
+    game.load.image('degree', 'degree.png');
+    game.load.image('rec_letter', 'rec_letter.png');
+    game.load.image('resume', 'resume.png');
+    game.load.image('tefl', 'tefl.png');
+    game.load.image('transcript', 'transcript.png');
+
     game.load.spritesheet('dude', 'amy.png', 48, 48);
+    
 
 }
 
 var player;
 var platforms;
 var cursors;
-var map;
-var layer;
-var objects;
-var required_documents;
+var background;
+var stars;
 var score = 0;
 var scoreText;
+var mailbox;
+
+function Document(name, image, amount, message){
+    this.name = name;
+    this.image = image;
+    this.amount=amount;
+    this.collected = 0;
+}
+
+var passport = new Document('Passport', 'passport', 1);
+var photo = new Document('Passport Photo copy', 'photo', 7);
+var bgcheck = new Document('Background Check', 'bgcheck', 1);
+var degree = new Document('Bachelors Degree', 'degree', 1);
+var rec_letter = new Document('Letter of Recommendation', 'rec_letter', 2);
+var resume = new Document('Resume', 'resume', 1);
+var tefl = new Document('TEFL certification', 'tefl', 1);
+var transcript = new Document('Sealed Transcript', 'transcript', 1);
+
+var docs_to_collect = [degree, passport, transcript, bgcheck, resume, rec_letter, photo, tefl];
 
 function create() {
-
     //  We're going to be using physics, so enable the Arcade Physics system
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    game.stage.backgroundColor = '#12C4FF';
+    //  A simple background for our game
+    background = game.add.tileSprite(0, 0, 2000, 600, "sky");
 
-    map = game.add.tilemap('map');
-	map.addTilesetImage('tiles_spritesheet');
-	map.addTilesetImage('required_documents');
-
-	layer = map.createLayer('layer1');
-	platforms = map.createLayer('layer2');
-    layer.dirty=true;
-    platforms.dirty=true;
-	// objects = map.createLayer('Object Layer 1')
-
-    //  This resizes the game world to match the layer dimensions
-    layer.resizeWorld();
     //  The platforms group contains the ground and the 2 ledges we can jump on
+    platforms = game.add.group();
+
     //  We will enable physics for any object that is created in this group
     platforms.enableBody = true;
+    game.world.setBounds(0, 0, 2000, 600);
+    // Here we create the ground.
+    var ground = platforms.create(0, game.world.height - 64, 'ground');
+    var ground2 = platforms.create(800, game.world.height - 64, 'ground');
+    var ground3 = platforms.create(1600, game.world.height - 64, 'ground');
+    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+    ground.scale.setTo(2, 2);
+    ground2.scale.setTo(2, 2);
+    ground3.scale.setTo(2, 2);
+    //  This stops it from falling away when you jump on it
+    ground.body.immovable = true;
+    ground2.body.immovable = true;
+    ground3.body.immovable = true;
+    //  Now let's create two ledges
+    var ledge = platforms.create(400, 400, 'ground');
+    ledge.body.immovable = true;
 
-    map.createFromObjects('Object Layer 1', 34, 'required_document', 0, true, false, required_documents);
+    ledge = platforms.create(-150, 250, 'ground');
+    ledge.body.immovable = true;
 
+    ledge = platforms.create(950, 250, 'sp');
+    ledge.body.immovable = true;
+
+    ledge = platforms.create(800, 100, 'sp');
+    ledge.body.immovable = true;
+
+    ledge = platforms.create(1100, 100, 'sp');
+    ledge.body.immovable = true;
+
+    ledge = platforms.create(1250, 350, 'sp');
+    ledge.body.immovable = true;
+
+    ledge = platforms.create(1400, 200, 'sp');
+    ledge.body.immovable = true;
+
+    ledge = platforms.create(1600, 400, 'sp');
+    ledge.body.immovable = true;
+
+    ledge = platforms.create(2000-121, 200, 'sp');
+    ledge.body.immovable = true;
     // The player and its settings
-    player = game.add.sprite(48, game.world.height - 200, 'dude');
+    player = game.add.sprite(32, game.world.height - 150, 'dude');
 
     //  We need to enable physics on the player
     game.physics.arcade.enable(player);
@@ -69,22 +125,46 @@ function create() {
     //  Player physics properties. Give the little guy a slight bounce.
     //player.body.bounce.y = 0.2;
     player.body.gravity.y = 300;
-    player.body.collideWorldBounds = false;
+    player.body.collideWorldBounds = true;
 
     //  Our two animations, walking left and right.
     player.animations.add('left', [0, 1, 2, 3], 10, true);
     player.animations.add('right', [5, 6, 7, 8], 10, true);
 
     //  Finally some stars to collect
-    required_documents = game.add.group();
+    docs = game.add.group();
 
     //  We will enable physics for any star that is created in this group
-    required_documents.enableBody = true;
+    docs.enableBody = true;
+    var documents_created = 0
+    //  Here we'll create 12 of them evenly spaced apart
+    for (var i = 0; i < docs_to_collect.length; i++)
+    {
+        var doc = docs_to_collect[i]
 
-    game.camera.follow(player);
-    game.camera.setBoundsToWorld()
+        for (var j=1; j <= doc.amount; j++){
+                //  Create a star inside of the 'stars' group
+                var star = docs.create(documents_created * 2000/15 + 10, 0, doc.image);
+                star.scale.setTo(2, 2);
+                //  Let gravity do its thing
+                star.body.gravity.y = 300;
+        
+                //  This just gives each star a slightly random bounce value
+                star.body.bounce.y = 0.2;
+                star.name = doc.name;
+                documents_created++;
+            }
+    }
+
+    mailbox = game.add.group();
+    var mail = mailbox.create(2000-58, 600-64-48, 'mailbox')
+    mailbox.enableBody = true;
+    mail.scale.setTo(2,2)
+    mail.immovable = true;
+
     //  The score
-    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+    scoreText = game.add.text(16, 16, 'Collect all the required documents!!', { fontSize: '32px', fill: '#000' });
+    scoreText.fixedToCamera = true;
 
     //  Our controls.
     cursors = game.input.keyboard.createCursorKeys();
@@ -92,12 +172,15 @@ function create() {
 }
 
 function update() {
-
+    game.camera.follow(player);
     //  Collide the player and the stars with the platforms
     game.physics.arcade.collide(player, platforms);
+    game.physics.arcade.collide(docs, platforms);
+    game.physics.arcade.collide(player, mailbox);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    game.physics.arcade.overlap(player, required_documents, collectStar, null, this);
+    game.physics.arcade.overlap(player, docs, collectDocument, null, this);
+    game.physics.arcade.overlap(player, mailbox, sendDocuments, null, this);
 
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
@@ -132,15 +215,26 @@ function update() {
 
 }
 
-function collectStar (player, required_document) {
+function collectDocument (player, star) {
     
     // Removes the star from the screen
-    required_document.kill();
+    star.kill();
 
     //  Add and update the score
     score += 10;
-    scoreText.text = 'Score: ' + score;
+    scoreText.text = star.name+' collected!';
+    //need to see how many of each type of document is collected.
 
+}
+
+function sendDocuments (player, mailbox){
+    console.log('Collision!')
+    //it doesn't detect a collision between player and mailbox idk
+    //when that happens, needs to check if she actually collected all the documents
+    //if so, she gets accepted to the program and then finds 2 pieces of mail, which are then printed in a box?
+
+    var KristenMessage = "Hi Amy! I love you and will miss you while you're in Korea but then I'll see you soon! We're so old now that a year doesn't seem like any time at all. You'll do great at your new job and some of the kids are going to love you and some other kids will act strange and you'll tell me stories about it. You're my best friend in the entire world! It doesn't change if you move! Love, Kristen.";
+    var ChrisMessage = "";
 }
 
 </script>
