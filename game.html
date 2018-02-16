@@ -1,6 +1,6 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
     <title>Phaser - Making your first game, part 9</title>
     <script type="text/javascript" src="phaser.js"></script>
@@ -33,7 +33,7 @@ function preload() {
     game.load.image('transcript', 'transcript.png');
 
     game.load.spritesheet('dude', 'amy.png', 48, 48);
-    
+
 
 }
 
@@ -45,13 +45,14 @@ var stars;
 var score = 0;
 var scoreText;
 var mailbox;
-
+var gameCompleted = false;
 function Document(name, image, amount, message){
     this.name = name;
     this.image = image;
     this.amount=amount;
     this.collected = 0;
 }
+var documents = {};
 
 var passport = new Document('Passport', 'passport', 1);
 var photo = new Document('Passport Photo copy', 'photo', 7);
@@ -61,7 +62,14 @@ var rec_letter = new Document('Letter of Recommendation', 'rec_letter', 2);
 var resume = new Document('Resume', 'resume', 1);
 var tefl = new Document('TEFL certification', 'tefl', 1);
 var transcript = new Document('Sealed Transcript', 'transcript', 1);
-
+documents['Passport'] = passport;
+documents['Passport Photo copy'] = photo;
+documents['Background Check'] = bgcheck;
+documents['Bachelors Degree'] = degree;
+documents['Letter of Recommendation'] = rec_letter;
+documents['Resume'] = resume;
+documents['TEFL certification'] = tefl;
+documents['Sealed Transcript'] = transcript;
 var docs_to_collect = [degree, passport, transcript, bgcheck, resume, rec_letter, photo, tefl];
 
 function create() {
@@ -148,7 +156,6 @@ function create() {
                 star.scale.setTo(2, 2);
                 //  Let gravity do its thing
                 star.body.gravity.y = 300;
-        
                 //  This just gives each star a slightly random bounce value
                 star.body.bounce.y = 0.2;
                 star.name = doc.name;
@@ -157,18 +164,22 @@ function create() {
     }
 
     mailbox = game.add.group();
-    var mail = mailbox.create(2000-58, 600-64-48, 'mailbox')
     mailbox.enableBody = true;
+    var mail = mailbox.create(2000-58, 600-64-48, 'mailbox')
+    //var mail = mailbox.create(400-58, 600-64-48, 'mailbox')
     mail.scale.setTo(2,2)
-    mail.immovable = true;
-
+    mail.scale.setTo(2,2)
+    mail.body.immovable = true;
+    //set up final letters
+    letters = game.add.group();
+    letters.enableBody = true;
     //  The score
-    scoreText = game.add.text(16, 16, 'Collect all the required documents!!', { fontSize: '32px', fill: '#000' });
+    scoreText = game.add.text(16, 16, 'Collect all the required documents!!', { fontSize: '32px', fill: '#000', wordWrap: true, wordWrapWidth: 700});
     scoreText.fixedToCamera = true;
 
     //  Our controls.
     cursors = game.input.keyboard.createCursorKeys();
-    
+
 }
 
 function update() {
@@ -176,12 +187,11 @@ function update() {
     //  Collide the player and the stars with the platforms
     game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(docs, platforms);
-    game.physics.arcade.collide(player, mailbox);
-
-    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+    game.physics.arcade.collide(player, mailbox, sendDocuments);
+    game.physics.arcade.collide(letters, platforms);
+    //  Checks to see if the player overlaps with any , of the stars, if he does call the collectStar function
     game.physics.arcade.overlap(player, docs, collectDocument, null, this);
-    game.physics.arcade.overlap(player, mailbox, sendDocuments, null, this);
-
+game.physics.arcade.overlap(player, letters, collectLetter, null, this);
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
 
@@ -206,7 +216,7 @@ function update() {
 
         player.frame = 4;
     }
-    
+
     //  Allow the player to jump if they are touching the ground.
     if (cursors.up.isDown && player.body.touching.down)
     {
@@ -216,7 +226,7 @@ function update() {
 }
 
 function collectDocument (player, star) {
-    
+    documents[star.name].collected++;
     // Removes the star from the screen
     star.kill();
 
@@ -228,15 +238,48 @@ function collectDocument (player, star) {
 }
 
 function sendDocuments (player, mailbox){
-    console.log('Collision!')
+  var allCollected = true;
+  var missedDocument;
+  var KristenMessage = "Hi Amy! I love you and will miss you while you're in Korea but then I'll see you soon! We're so old now that a year doesn't seem like any time at all. You'll do great at your new job and some of the kids are going to love you and some other kids will act strange and you'll tell me stories about it. You're my best friend in the entire world! It doesn't change if you move! Love, Kristen.";
+  var ChrisMessage = "Hi Amy! I love you and I'll miss you when you're gone. Im so proud/jealous of you for doing this, don't worry it'll be great. I know it's hard now, but it'll get easier, and it'll be so cool, you'll be all worldly and shit. No matter what happens, even if you are a million miles away for years and years we will always be friends, so dont worry about everyone back at home, do your best and worry about new Amy. Love, Chris";
     //it doesn't detect a collision between player and mailbox idk
     //when that happens, needs to check if she actually collected all the documents
     //if so, she gets accepted to the program and then finds 2 pieces of mail, which are then printed in a box?
+  for(var document in documents){
+    var currentDoc = documents[document];
+    if(currentDoc.amount !== currentDoc.collected){
+      missedDocument = currentDoc.name;
+      allCollected = false;
+    }
+  }
+  if(allCollected){
+    scoreText.text = "Everything is collected!! Welcome to Korea";
+    var kristenMail = letters.create(1610, 352, 'transcript');
+    kristenMail.text = KristenMessage
+    var chrisMail = letters.create(1876.66,152,'transcript');
+    chrisMail.text = ChrisMessage;
+    kristenMail.scale.setTo(2, 2);
+    //  Let gravity do its thing
+    kristenMail.body.gravity.y = 300;
+    //  This just gives each star a slightly random bounce value
+    kristenMail.body.bounce.y = 0.2;
 
-    var KristenMessage = "Hi Amy! I love you and will miss you while you're in Korea but then I'll see you soon! We're so old now that a year doesn't seem like any time at all. You'll do great at your new job and some of the kids are going to love you and some other kids will act strange and you'll tell me stories about it. You're my best friend in the entire world! It doesn't change if you move! Love, Kristen.";
-    var ChrisMessage = "";
+    chrisMail.scale.setTo(2, 2);
+    //  Let gravity do its thing
+    chrisMail.body.gravity.y = 300;
+    //  This just gives each star a slightly random bounce value
+    chrisMail.body.bounce.y = 0.2;
+  }
+  else {
+    scoreText.text = "Oh no you missed your " + missedDocument + "! Go get it!!";
+  }
+
 }
 
+function collectLetter(player,letter){
+  scoreText.text = letter.text;
+  letter.kill();
+}
 </script>
 
 </body>
